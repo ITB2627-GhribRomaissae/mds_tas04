@@ -1,4 +1,3 @@
-
 import xml.etree.ElementTree as ET
 import json
 
@@ -125,19 +124,6 @@ def filtrar_incidencies(incidencies):
 # 3. DESAR LES INCIDÈNCIES AL JSON
 # ==================================================
 
-def obtenir_id(incidencia):
-
-    # Acceptar ID, Id o id
-
-    for camp, valor in incidencia.items():
-
-        if camp.strip().lower() == "id":
-
-            return str(valor).strip()
-
-    return ""
-
-
 def desar_incidencies_json(incidencies):
 
     # COMPROVAR SI EXISTEIX EL JSON
@@ -161,6 +147,7 @@ def desar_incidencies_json(incidencies):
             )
         )
 
+        console.input("\n[dim]Prem Enter per veure l'informe...[/dim]")
         return
 
     # EL FITXER JA EXISTEIX
@@ -202,7 +189,9 @@ def desar_incidencies_json(incidencies):
             )
         )
 
-    # OPCIÓ 2: AFEGIR SENSE DUPLICATS
+        console.input("\n[dim]Prem Enter per veure l'informe...[/dim]")
+
+    # OPCIÓ 2: AFEGIR NOVES INCIDÈNCIES
 
     elif opcio == "2":
 
@@ -227,49 +216,16 @@ def desar_incidencies_json(incidencies):
             )
 
             return
+        except UnicodeDecodeError as error:
 
-        # Obtenir els ID existents
+            console.print(
+                f"[bold red]ERROR:[/bold red] {error}"
+            )
 
-        ids_existents = set()
+            return
 
-        for incidencia in existents:
-
-            identificador = obtenir_id(incidencia)
-
-            if identificador:
-                ids_existents.add(identificador)
-
-        afegides = 0
-        duplicades = 0
-        sense_id = 0
-
-        # Revisar les incidències noves
-
-        for incidencia in incidencies:
-
-            identificador = obtenir_id(incidencia)
-
-            # Comprovar que tingui ID
-
-            if not identificador:
-
-                sense_id += 1
-                continue
-
-            # Evitar duplicats
-
-            if identificador in ids_existents:
-
-                duplicades += 1
-                continue
-
-            # Afegir incidència nova
-
-            existents.append(incidencia)
-
-            ids_existents.add(identificador)
-
-            afegides += 1
+        afegides = len(incidencies)
+        existents.extend(incidencies)
 
         # Actualitzar el JSON
 
@@ -286,13 +242,13 @@ def desar_incidencies_json(incidencies):
             Panel(
                 f"[bold green]Actualització completada![/bold green]\n\n"
                 f"[green]Incidències afegides:[/green] {afegides}\n"
-                f"[yellow]Duplicades evitades:[/yellow] {duplicades}\n"
-                f"[red]Sense ID:[/red] {sense_id}\n"
                 f"[cyan]Total al JSON:[/cyan] {len(existents)}",
                 title="RESULTAT DE L'ACTUALITZACIÓ",
                 border_style=VERD
             )
         )
+
+        console.input("\n[dim]Prem Enter per veure l'informe...[/dim]")
 
     else:
 
@@ -667,6 +623,11 @@ def main():
         )
 
     except OSError as error:
+
+        console.print(
+            f"[bold red]ERROR:[/bold red] {error}"
+        )
+    except UnicodeEncodeError as error:
 
         console.print(
             f"[bold red]ERROR:[/bold red] {error}"
